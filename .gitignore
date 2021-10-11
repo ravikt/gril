@@ -1,0 +1,4 @@
+sample/
+img_data_tmp/
+*.hdf5
+*.npz
