@@ -1,4 +1,5 @@
 sample/
 img_data_tmp/
+__pychache__/
 *.hdf5
 *.npz
