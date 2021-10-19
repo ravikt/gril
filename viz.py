@@ -8,5 +8,5 @@ print(images.shape)
 
 
 plt.figure()
-plt.imshow(images[0])
-plt.savefig('sample.png')
+plt.imshow(images[5000])
+plt.savefig('gaze_5000.png')
