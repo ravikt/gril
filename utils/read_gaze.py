@@ -74,9 +74,11 @@ def preprocess_gaze_heatmap(gaze_2ds, sigma):
         mask = np.expand_dims(mask, axis=2)
         gmaps[i] = copy.deepcopy(mask)
         # print(gmaps[i])
-        print(np.any(np.isnan(gmaps[i])))
-        plt.imshow(np.squeeze(gmaps[i], axis=2))
-        plt.imsave(f'out{i}.png', np.squeeze(gmaps[i], axis=2))
+        # print(np.any(np.isnan(gmaps[i])))
+        if np.any(np.isnan(gmaps[i])):
+            break
+        #plt.imshow(np.squeeze(gmaps[i], axis=2))
+        #plt.imsave(f'out{i}.png', np.squeeze(gmaps[i], axis=2))
 
     gmaps = torch.tensor(gmaps, dtype=torch.float32).permute(0, 3, 1, 2)
     return gmaps

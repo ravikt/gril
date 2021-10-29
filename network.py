@@ -102,8 +102,8 @@ def agil_gaze_model():
 if __name__ == "__main__":
 
     # shuffle_size=
-    batch_size = 2
-    path = "car.npz"
+    batch_size = 4
+    path = "/scratch/user/ravikt/small.npz"
     with np.load(path) as data:
         l = len(data["images"])
         train_examples = np.reshape(data['images'], (l, 84, 84, 1))
@@ -120,4 +120,5 @@ if __name__ == "__main__":
     # train_dataset = train_dataset.shuffle(shuffle_size).batch(batch_size)
     train_dataset = train_dataset.batch(batch_size)
 
-    model.fit(train_dataset, epochs=10)
+    model.fit(train_dataset, epochs=50)
+    model.save('small.h5')
