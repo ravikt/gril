@@ -37,7 +37,7 @@ def my_kld(y_true, y_pred):
 
 def agil_gaze_model():
     # Constants
-    img_shape = 84
+    img_shape = 224 #84
     k = 1
     # Constants
     SHAPE = (img_shape, img_shape, k)  # height * width * channel
@@ -48,37 +48,37 @@ def agil_gaze_model():
     inputs = L.Input(shape=SHAPE)
     x = inputs
 
-    conv1 = L.Conv2D(32, (8, 8), strides=4, padding='valid')
+    conv1 = L.Conv2D(32, (8, 8), strides=4, padding='same')
     x = conv1(x)
     x = L.Activation('relu')(x)
     x = L.BatchNormalization()(x)
     x = L.Dropout(dropout)(x)
 
-    conv2 = L.Conv2D(64, (4, 4), strides=2, padding='valid')
+    conv2 = L.Conv2D(64, (4, 4), strides=2, padding='same')
     x = conv2(x)
     x = L.Activation('relu')(x)
     x = L.BatchNormalization()(x)
     x = L.Dropout(dropout)(x)
 
-    conv3 = L.Conv2D(64, (3, 3), strides=1, padding='valid')
+    conv3 = L.Conv2D(64, (3, 3), strides=1, padding='same')
     x = conv3(x)
     x = L.Activation('relu')(x)
     x = L.BatchNormalization()(x)
     x = L.Dropout(dropout)(x)
 
-    deconv1 = L.Conv2DTranspose(64, (3, 3), strides=1, padding='valid')
+    deconv1 = L.Conv2DTranspose(64, (3, 3), strides=1, padding='same')
     x = deconv1(x)
     x = L.Activation('relu')(x)
     x = L.BatchNormalization()(x)
     x = L.Dropout(dropout)(x)
 
-    deconv2 = L.Conv2DTranspose(32, (4, 4), strides=2, padding='valid')
+    deconv2 = L.Conv2DTranspose(32, (4, 4), strides=2, padding='same')
     x = deconv2(x)
     x = L.Activation('relu')(x)
     x = L.BatchNormalization()(x)
     x = L.Dropout(dropout)(x)
 
-    deconv3 = L.Conv2DTranspose(1, (8, 8), strides=4, padding='valid')
+    deconv3 = L.Conv2DTranspose(1, (8, 8), strides=4, padding='same')
     x = deconv3(x)
 
     outputs = L.Activation(my_softmax)(x)
@@ -106,8 +106,8 @@ if __name__ == "__main__":
     path = "/scratch/user/ravikt/small.npz"
     with np.load(path) as data:
         l = len(data["images"])
-        train_examples = np.reshape(data['images'], (l, 84, 84, 1))
-        train_labels = np.reshape(data['heatmap'], (l, 84, 84, 1))
+        train_examples = np.reshape(data['images'], (l, 224, 224, 1))
+        train_labels = np.reshape(data['heatmap'], (l, 224, 224, 1))
 
     # print(np.any(np.isnan(train_labels)))
     # print(tf.math.is_nan(train_labels[8]))

@@ -11,8 +11,8 @@ import torch
 
 def reshape_image(image):
     """Warp frames to 84x84 as done in the Nature paper and later work."""
-    width = 84
-    height = 84
+    width = 224 #84
+    height = 224 #84
     frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
     frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
@@ -27,7 +27,7 @@ def reshape_heatmap(heatmap):
 
     for i in range(len(heatmap)):
         ghmap.append(cv2.resize(
-            heatmap[i], (84, 84), interpolation=cv2.INTER_AREA))
+            heatmap[i], (224, 224), interpolation=cv2.INTER_AREA))
 
     return np.array(ghmap)
 
@@ -44,8 +44,8 @@ def get_mask(center, size, sig):
     return mask / mask.sum()
 
 
-h = 480  # row
-w = 704  # column
+h = 224 # 480  # row
+w = 224 #704  # column
 # gaze_pos = np.array(gaze_pos)
 # gaze_pos = gaze_pos.astype(float)
 

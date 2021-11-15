@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 
 def reshape_image(image):
     """Warp frames to 84x84 as done in the Nature paper and later work."""
-    width = 84
-    height = 84
+    width = 224
+    height = 224
     frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
     frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
@@ -34,9 +34,9 @@ agil.summary()
 #sample = d.generate_data_for_gaze_prediction()
 
 ##d.load_predicted_gaze_heatmap(sys.argv[3]) 
-sample = cv2.imread('/scratch/user/ravikt/rgb_4.png')
+sample = cv2.imread('/scratch/user/ravikt/sample/rgb_400.png')
 sample = reshape_image(sample)
-sample = np.reshape(sample, (1,84, 84, 1))
+sample = np.reshape(sample, (1, 224, 224, 1))
 
 print(sample.shape)
 
@@ -51,7 +51,7 @@ output = np.squeeze(output, axis=0)
 #output = output*255
 #print(output.shape)
 plt.imshow(np.squeeze(output))
-plt.imsave('out_4.png', np.squeeze(output))
+plt.imsave('out_400.png', np.squeeze(output))
 #output = output.astype('uint8')
 
 #print(np.nonzero(output))
