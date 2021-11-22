@@ -1,3 +1,4 @@
+import argparse
 import cv2
 import tensorflow as tf
 import sys
@@ -35,9 +36,9 @@ customObjects = {
 # d.load_predicted_gaze_heatmap(sys.argv[3])
 
 
-def save_preds(idx, img_pred):
+def save_preds(idx, img_pred, ouput_path):
     now = datetime.datetime.now()
-    save_dir = os.path.join(test_data_path, f'{now.month}{now.day}')
+    save_dir = os.path.join(output_path, f'{now.month}{now.day}')
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     plt.imshow(np.squeeze(img_pred))
@@ -48,14 +49,15 @@ def get_index(filename):
     return re.search(r'\d+', filename).group(0)
 
 
-def gaze_predict(dirs, model_path):
+def gaze_predict(input_path, model_path, output_path):
+    dirs = os.listdir(input_path)
     # Load the trained model
     print("Predicting results...")
     agil = tf.keras.models.load_model(model_path, custom_objects=customObjects)
     # agil.summary()
     for img_path in sorted(dirs):
         print(img_path)
-        img = cv2.imread(os.path.join(test_data_path, img_path))
+        img = cv2.imread(os.path.join(input_path, img_path))
         #print(img.shape)
         #print(os.path.join(test_data_path, img_path))
         img = reshape_image(img)
@@ -63,15 +65,25 @@ def gaze_predict(dirs, model_path):
 
         output = agil.predict(img)
         print(output.shape)
-        output = np.squeeze(output, axis=0)
-        save_preds(get_index(img_path), output)
+        out_img = np.squeeze(output, axis=0)
+        save_preds(get_index(img_path), out_img, output_path)
     print("Prediction complete!")
 
 
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser(description="Model prediction script")
+    parser.add_argument("-p", "--path", type=str, help="path to model file")
+    parser.add_argument("-i", "--inpath", type=str, help="path to test folder")
+    parser.add_argument("-o", "--outpath", type=str, help="path for results")
+    
+    args = parser.parse_args()
     # Path for model and the data
-    model_path = '/scratch/user/ravikt/results_test/small_large_res.h5'
-    test_data_path = '/scratch/user/ravikt/sample/img/'
-    dirs = os.listdir(test_data_path)
-    gaze_predict(dirs, model_path)
+    model_path = args.path
+    input_path = args.inpath
+    output_path = args.outpath
+    #model_path = '/scratch/user/ravikt/results_test/small_large_res.h5'
+    #input_path = '/scratch/user/ravikt/sample/img/'
+    #output_path= '/scratch/user/ravikt/sample/'
+    #dirs = os.listdir(input_path)
+    gaze_predict(input_path, model_path, output_path)
