@@ -1,3 +1,5 @@
+# Example python predict.py -p ../results_test/small_large_res.h5 -i ../sample/img/ -o ../sample/
+
 import argparse
 import cv2
 import tensorflow as tf
@@ -82,8 +84,5 @@ if __name__ == "__main__":
     model_path = args.path
     input_path = args.inpath
     output_path = args.outpath
-    #model_path = '/scratch/user/ravikt/results_test/small_large_res.h5'
-    #input_path = '/scratch/user/ravikt/sample/img/'
-    #output_path= '/scratch/user/ravikt/sample/'
-    #dirs = os.listdir(input_path)
+    
     gaze_predict(input_path, model_path, output_path)
