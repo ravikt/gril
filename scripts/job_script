@@ -1,0 +1,36 @@
+#!/bin/bash
+#SBATCH --get-user-env=L             #Replicate login environment
+#SBATCH --time=24:00:00
+#SBATCH --nodes=4
+#SBATCH --ntasks-per-node=23
+#SBATCH --partition=gpu
+#SBATCH --job-name="Ur=20"
+#SBATCH --mem=56000M
+#SBATCH --output=LOG_simulation.dat
+#SBATCH --mail-user=sujyesh@tamu.edu
+#SBATCH --mail-type=All
+##SBATCH --test-only
+#
+echo "SLURM_JOB_ID="$SLURM_JOB_ID
+echo "SLURM_JOB_NODELIST"=$SLURM_JOB_NODELIST
+echo "SLURM_NNODES"=$SLURM_NNODES
+echo "SLURMTMPDIR="$SLURMTMPDIR
+
+cd $SLURM_SUBMIT_DIR
+echo "working directory = "$SLURM_SUBMIT_DIR
+
+#module load iimpi/2019b
+module load Python/3.6.6-intel-2018b
+
+ml PETSc/3.6.2-Python-2.7.16
+module list
+#
+
+echo "Launch test with srun"
+NPROCS=`srun --nodes=${SLURM_NNODES} bash -c 'hostname' |wc -l`
+export OMP_NUM_THREADS=1
+echo NPROCS=$NPROCS
+mpirun -n $NPROCS ./testt
+
+#
+echo "All Done!"
