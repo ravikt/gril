@@ -18,47 +18,27 @@ def reshape_image(image):
     frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
     frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
-    return frame / 255.0
+    return frame / 255.0 
 
+def video(img_dir):
+    files = os.listdir(img_dir)
+    files.sort(key=lambda f: int(re.sub('\D', '', f)))
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
+    video = cv2.VideoWriter('video.avi', fourcc, 1, (224, 224))
 
-customObjects = {
-    'my_softmax': my_softmax,
-    'my_kld': my_kld,
-    'NSS': NSS
-}
+    for img_path in files:
+       image = cv2.imread(os.path.join(img_dir, img_path))
+       video.write(image)
 
-
-#d = Dataset(sys.argv[1], sys.argv[2])
-#sample = d.generate_data_for_gaze_prediction()
-
-# d.load_predicted_gaze_heatmap(sys.argv[3])
-
-
-def save_preds(idx, img_pred, ouput_path):
-    now = datetime.datetime.now()
-    save_dir = os.path.join(output_path, f'{now.month}{now.day}')
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
-    plt.imshow(np.squeeze(img_pred))
-    plt.imsave(os.path.join(save_dir, f'gh_{idx}.png'), np.squeeze(img_pred))
-
-
-def get_index(filename):
-    return re.search(r'\d+', filename).group(0)
-
-
+    cv2.destroyAllWindows()
+    video.release()
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description="Model prediction script")
-    parser.add_argument("-i", "--inpath", type=str, help="path to test folder")
-    parser.add_argument("-g", "--ghpath", type=str, help="path to gaze heatmap")
-    parser.add_argument("-o", "--outpath",type=str, help="path to video path")
-    
+    parser = argparse.ArgumentParser(description="Script for writing videos")
+    parser.add_argument("-i", "--inpath", type=str, help="path to the folder")   
     args = parser.parse_args()
     # Path for model and the data
-    model_path = args.path
     input_path = args.inpath
-    output_path = args.outpath
     
-    gaze_predict(input_path, model_path, output_path)
+    video(input_path)
