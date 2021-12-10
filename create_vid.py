@@ -1,4 +1,4 @@
-# Example python predict.py -p ../results_test/small_large_res.h5 -i ../sample/img/ -o ../sample/
+
 
 import argparse
 import cv2
@@ -10,15 +10,18 @@ import os
 import re
 import datetime
 
+def overlay():
+    pass
 
 def reshape_image(image):
     """Warp frames to 84x84 as done in the Nature paper and later work."""
     width = 224
     height = 224
     frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+    #frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
     frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
-    return frame / 255.0 
+    return frame
+    #return frame / 255.0 
 
 def video(img_dir):
     files = os.listdir(img_dir)
@@ -28,6 +31,8 @@ def video(img_dir):
 
     for img_path in files:
        image = cv2.imread(os.path.join(img_dir, img_path))
+       image = np.uint8(reshape_image(image))
+       print(image.shape)
        video.write(image)
 
     cv2.destroyAllWindows()
