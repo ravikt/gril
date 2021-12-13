@@ -6,7 +6,7 @@ from keras.models import Model, Sequential
 BATCH_SIZE = 50
 num_epoch = 50
 num_action = 18
-SHAPE = (84,84,1) # height * width * channel 
+SHAPE = (224,224,1) # height * width * channel 
 dropout = 0.0
 
 if True: 
@@ -67,7 +67,7 @@ if True:
                 optimizer=opt,metrics=[K.metrics.sparse_categorical_accuracy])
 
 if __name__ == "__main__":
-    # LOAD the Atari-HEAD Dataset in your way
+    # Load the Airsim Data
     from load_data import *
     d = Dataset(sys.argv[1], sys.argv[2]) #tarfile (images), txtfile (labels)
     d.load_predicted_gaze_heatmap(sys.argv[3]) #npz file (predicted gaze heatmap)
