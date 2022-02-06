@@ -39,7 +39,7 @@ def get_mask(center, size, sig):
     mask = np.zeros(size)
     mask[keep] = 1
     mask = gaussian_filter(mask, sigma=sig)
-    print(mask.sum())
+    #print(mask.sum())
 
     return mask / mask.sum()
 
@@ -62,7 +62,7 @@ def preprocess_gaze_heatmap(gaze_2ds, sigma):
     # x and y not necessarily means values along x and y axis
     # dim_y, dim_x = h, w#gmaps.shape[1], gmaps.shape[2]
 
-    print(gaze_2ds.shape)
+    # print(gaze_2ds.shape)
     for i in range(len(gaze_2ds)):
         gaze_x, gaze_y = gaze_2ds[i][0], gaze_2ds[i][1]
         if gaze_x == -1:
