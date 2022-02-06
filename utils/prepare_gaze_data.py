@@ -16,6 +16,8 @@ def prepare_data(data_path):
        allow = ["rgb", "log.csv"]
        dirname = os.path.join(data_path, subdir)
        print(dirname)
+       # This loop is causing the pre processing to run twice
+       # Do something about it
        for fname in os.listdir(dirname):
           if fname in allow:
 
@@ -60,15 +62,11 @@ def prepare_data(data_path):
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
-    #data_path = '/scratch/user/ravikt/col_data/moving_truck_mountains14/'
-    import argparse
-    parser = argparse.ArgumentParser(description="Model prediction script")
-    parser.add_argument("-p", "--path", type=str, help="path to raw dataset")
-   
-    args = parser.parse_args()
-    data_path = args.path
-=======
     data_path = '/scratch/user/ravikt/col_data/moving_truck_mountains14/'
->>>>>>> main
+    #import argparse
+    #parser = argparse.ArgumentParser(description="Model prediction script")
+    #parser.add_argument("-p", "--path", type=str, help="path to raw dataset")
+   
+    #args = parser.parse_args()
+    #data_path = args.path
     prepare_data(data_path)
