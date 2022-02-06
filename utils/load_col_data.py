@@ -60,6 +60,7 @@ def prepare_data(data_path):
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     #data_path = '/scratch/user/ravikt/col_data/moving_truck_mountains14/'
     import argparse
     parser = argparse.ArgumentParser(description="Model prediction script")
@@ -67,4 +68,7 @@ if __name__ == "__main__":
    
     args = parser.parse_args()
     data_path = args.path
+=======
+    data_path = '/scratch/user/ravikt/col_data/moving_truck_mountains14/'
+>>>>>>> main
     prepare_data(data_path)
