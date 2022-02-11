@@ -1,4 +1,5 @@
-'''Example network architecture for AGIL (Attention-guided imitation learning'''
+'''Network architecture for AGIL (Attention-guided imitation learning'''
+'''for AirSim data. Implmentation done as a part of cycle-of-learning project'''
 import logging
 #import pydotplus
 import tensorflow as tf 
@@ -28,40 +29,87 @@ if True:
     x=imgs
     x=L.Multiply()([x,g])
     x_intermediate=x
+
+    x=L.Conv2D(128, (5,5), strides=2, padding='same')(x)
+    x=L.BatchNormalization()(x)
+    x=L.Activation('relu')(x)
+
+    #x=L.Conv2D(128, (5,5), strides=2, padding='same')(x)
+    #x=L.BatchNormalization()(x)
+    #x=L.Activation('relu')(x)
+ 
+    x=L.Conv2D(64, (5,5), strides=2, padding='same')(x)
+    x=L.BatchNormalization()(x)
+    x=L.Activation('relu')(x)
+
+    x=L.Conv2D(64, (5,5), strides=2, padding='same')(x)
+    x=L.BatchNormalization()(x)
+    x=L.Activation('relu')(x)
+    #x=L.Dropout(dropout)(x)
+
     x=L.Conv2D(32, (5,5), strides=2, padding='same')(x)
     x=L.BatchNormalization()(x)
     x=L.Activation('relu')(x)
-    x=L.Dropout(dropout)(x)
+    #x=L.Dropout(dropout)(x)
 
-    x=L.Conv2D(64, (3,3), strides=2, padding='same')(x)
+    x=L.Conv2D(32, (5,5), strides=2, padding='same')(x)
     x=L.BatchNormalization()(x)
     x=L.Activation('relu')(x)
-    x=L.Dropout(dropout)(x)
 
-    x=L.Conv2D(64, (3,3), strides=2, padding='same')(x)
-    x=L.BatchNormalization()(x)
-    x=L.Activation('relu')(x)
+    
+    #x=L.Conv2D(32, (5,5), strides=2, padding='same')(x)
+    #x=L.BatchNormalization()(x) 
+    #x=L.Activation('relu')(x)
+   
+    x=L.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(x)
+    x=L.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(x)
+
     # ============================ channel 2 ============================
     orig_x=imgs
+
+    orig_x=L.Conv2D(128, (5,5), strides=2, padding='same')(orig_x)
+    orig_x=L.BatchNormalization()(orig_x)
+    orig_x=L.Activation('relu')(orig_x)
+
+    
+    #orig_x=L.Conv2D(128, (5,5), strides=2, padding='same')(orig_x)
+    #orig_x=L.BatchNormalization()(orig_x)
+    #orig_x=L.Activation('relu')(orig_x)
+
+
+    orig_x=L.Conv2D(64, (5,5), strides=2, padding='same')(orig_x)
+    orig_x=L.BatchNormalization()(orig_x)
+    orig_x=L.Activation('relu')(orig_x)
+
+    orig_x=L.Conv2D(64, (5,5), strides=2, padding='same')(orig_x)
+    orig_x=L.BatchNormalization()(orig_x)
+    orig_x=L.Activation('relu')(orig_x)
+    #orig_x=L.Dropout(dropout)(orig_x)
+
     orig_x=L.Conv2D(32, (5,5), strides=2, padding='same')(orig_x)
     orig_x=L.BatchNormalization()(orig_x)
     orig_x=L.Activation('relu')(orig_x)
-    orig_x=L.Dropout(dropout)(orig_x)
+    #orig_x=L.Dropout(dropout)(orig_x)
 
-    orig_x=L.Conv2D(64, (3,3), strides=2, padding='same')(orig_x)
-    orig_x=L.BatchNormalization()(orig_x)
-    orig_x=L.Activation('relu')(orig_x)
-    orig_x=L.Dropout(dropout)(orig_x)
-
-    orig_x=L.Conv2D(64, (3,3), strides=2, padding='same')(orig_x)
+    orig_x=L.Conv2D(32, (5,5), strides=2, padding='same')(orig_x)
     orig_x=L.BatchNormalization()(orig_x)
     orig_x=L.Activation('relu')(orig_x)
 
+    #orig_x=L.Conv2D(32, (5,5), strides=2, padding='same')(orig_x)
+    #orig_x=L.BatchNormalization()(orig_x)
+    #orig_x=L.Activation('relu')(orig_x)
+    orig_x= L.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(orig_x)
+    orig_x= L.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(orig_x)
+  
+ 
     x=L.Average()([x,orig_x])
-    x=L.Dropout(dropout)(x)
+    #x=L.Dropout(dropout)(x)
     x=L.Flatten()(x)
-    x=L.Dense(512, activation='elu')(x)
     x=L.Dropout(dropout)(x)
+    x=L.Dense(512, activation='elu')(x)
+    x=L.Dense(256, activation='elu')(x)
+    x=L.Dense(128, activation='elu')(x)
+    #x=L.Dropout(dropout)(x)
     output=L.Dense(num_action, name='action', activation='elu')(x)    
 
     #logits=L.Dense(num_action, name="logits")(x)
