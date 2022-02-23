@@ -133,40 +133,27 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="AGIL Network Architecture")
     
-    parser.add_argument("-i", "--images", type=str, help="path to images" )
-    parser.add_argument("-l", "--labels", type=str, help="path to action labels")
+    parser.add_argument("-d", "--data", type=str, help="path to dataset" )
+    #parser.add_argument("-l", "--labels", type=str, help="path to action labels")
     #parser.add_argument("-g", "--ghmap",  type=str, help="path to predicted gaze heatmap")
     #d = Dataset(sys.argv[1], sys.argv[2]) #tarfile (images), txtfile (labels)
     #d.load_predicted_gaze_heatmap(sys.argv[3]) #npz file (predicted gaze heatmap)
     #d.standardize() 
     
     args = parser.parse_args()
-    imgs_path = args.images
-    lbls_path = args.labels
+    data_path = args.data
+    #lbls_path = args.labels
     
-    with np.load(imgs_path) as data:
+    with np.load(data_path) as data:
         l = len(data["images"])
-        #train_imgs = data['images']
+        train_imgs = data['images']
         train_imgs = np.reshape(data['images'], (l, 224, 224, 1))
         print(train_imgs.shape)
-        #train_gaze = data['heatmap']
+        train_gaze = data['heatmap']
         train_gaze = np.reshape(data['heatmap'], (l, 224, 224, 1)) 
+        print(train_gaze.shape)
+        train_act = data['vel_comm']
+        print(train_act.shape)
 
-    with np.load(lbls_path) as data:
-        l = len(data['action'])
-        print(data['action'].shape)
-        train_lbls = data['action']
-        print(train_lbls[90])
-        #train_lbls = np.reshape(data['action'], (l, 4, 1))
-        #print(train_lbls.shape)
-        #train_lbls = tf.squeeze(train_lbls, axis=-1)
-
-    #train_dataset = tf.data.Dataset.from_tensor_slices(
-    #    (train_examples, train_labels))    
-    #train_imgs, train_lbls, train_gaze = some_loader(train_imgs_path, train_lbls_path, train_gaze_path)
-    #try:
-    model.fit([train_imgs, train_gaze], train_lbls, BATCH_SIZE, epochs=num_epoch, shuffle=True)
+    model.fit([train_imgs, train_gaze], train_act, BATCH_SIZE, epochs=num_epoch, shuffle=True)
     model.save("agil_model.h5")
-    #except:
-    #  logging.error("Error occured during training")
-
