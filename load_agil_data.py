@@ -2,6 +2,7 @@
 Data loader for Airsim dataset
 This file reads dataset by
 Bera et al Gaze augmented imitation learning
+<<<<<<< HEAD
 
 This program should take 
 Input : path to images and log file (for action labels)
@@ -11,6 +12,10 @@ Example:
 '''
 
 
+=======
+'''
+
+>>>>>>> main
 import sys, os, re, threading, time, copy
 import numpy as np
 import csv
@@ -30,8 +35,11 @@ def reshape(img):
     frame = np.reshape(np.array(frame), (224, 224, 1))
     return frame / 255.0
 
+<<<<<<< HEAD
 # takes log file from the corresponding directory and 
 # stores as compressed numpy data
+=======
+>>>>>>> main
 def action_label(csv_path, dirname):
     act_lbls = []
     with open(csv_path, 'r') as csvfile:
@@ -52,12 +60,15 @@ def action_label(csv_path, dirname):
     #return act_lbls
 
 
+<<<<<<< HEAD
 # Following should the same function as load_col_data.py
 # Earlier (img, gaze) was created using load_col_data.py
 # and (act_labels) were created using load_agil_data.py
 # perhaps I was not sure whether to create npz data or
 # directly go for creating batch generator
 
+=======
+>>>>>>> main
 def some_loader(imgs_dir, csv_dir, gaze_dir):
     '''
     The function takes directory path of images, gaze and log files
