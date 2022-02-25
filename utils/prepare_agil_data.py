@@ -61,7 +61,7 @@ def prepare_data(data_path):
 
 
 if __name__ == "__main__":
-    data_path = '/scratch/user/ravikt/col_data/moving_truck_mountains14/'
+    data_path = '/scratch/user/ravikt/airsim/data/moving_truck_mountains2/'
     #import argparse
     #parser = argparse.ArgumentParser(description="Model prediction script")
     #parser.add_argument("-p", "--path", type=str, help="path to raw dataset")

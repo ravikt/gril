@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --get-user-env=L             #Replicate login environment
-#SBATCH --time=2:00:00
+#SBATCH --time=4:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition=gpu
@@ -23,7 +23,7 @@ echo "working directory = "$SLURM_SUBMIT_DIR
 module load Python/3.6.6-intel-2018b
 source ../vscl/col/bin/activate
 module list
-python agil.py -i ../airsim/test_data/truck_mountains3.npz -l ../airsim/test_data/act_tm3.npz
+python agil.py -d ../airsim/test_data/moving_truck14.npz
 
 
 #

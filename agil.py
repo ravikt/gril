@@ -11,7 +11,7 @@ from tensorflow.keras.utils import plot_model
 #from load_agil_data import some_loader
 
 BATCH_SIZE = 2#50
-num_epoch = 50
+num_epoch = 30
 num_action = 4 # act_roll, act_pitch, act_throttle, act_yaw
 SHAPE = (224,224,1) # height * width * channel 
 dropout = 0.5
