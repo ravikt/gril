@@ -40,30 +40,30 @@ def prepare_data(data_path):
 
                     coords = np.hstack((row[-3], row[-2]))
                     gaze_pos.append(coords)
-                    act_commands = np.hstack((row[-7], row[-6], row[-5], row[-4]))
-                    act_lbls.append(act_commands)
+                    #act_commands = np.hstack((row[-7], row[-6], row[-5], row[-4]))
+                    #act_lbls.append(act_commands)
 
             gaze_pos = np.array(gaze_pos)
             gaze_pos = gaze_pos.astype(float)
 
-            act_lbls = np.array(act_lbls)
-            act_lbls = act_lbls.astype(float)
+            #act_lbls = np.array(act_lbls)
+            #act_lbls = act_lbls.astype(float)
             # print(gaze_pos.shape)
             imgs = np.array(imgs)
             #print(imgs.shape)
 
-            hmap = preprocess_gaze_heatmap(np.array(gaze_pos), 10)
-            hmap = np.squeeze(hmap, axis=1)
-            hmap = reshape_heatmap(hmap)
-            print(hmap.shape)
+            #hmap = preprocess_gaze_heatmap(np.array(gaze_pos), 10)
+            #hmap = np.squeeze(hmap, axis=1)
+            #hmap = reshape_heatmap(hmap)
+            #print(hmap.shape)
             print(imgs.shape)
-            print(act_lbls.shape)
-            hmap = np.reshape(hmap, (hmap.shape[0], hmap.shape[1], hmap.shape[2], 1))  
-            imgs = np.reshape(imgs, (imgs.shape[0], imgs.shape[1], imgs.shape[2], 1)) 
-            act_lbls = np.reshape(act_lbls, (act_lbls.shape[0], act_lbls.shape[1], 1))
+            print(gaze_pos.shape)
+            #hmap = np.reshape(hmap, (hmap.shape[0], hmap.shape[1], hmap.shape[2], 1))
+            imgs     = np.reshape(imgs, (imgs.shape[0], imgs.shape[1], imgs.shape[2], 1)) 
+            gaze_pos = np.reshape(gaze_pos, (gaze_pos.shape[0], gaze_pos.shape[1], 1))
        npz_name = data_path.split("/")[-2]
        print(npz_name)
-       np.savez_compressed(f"{npz_name}.npz", images=imgs, heatmap=hmap, vel_comm=act_lbls)
+       np.savez_compressed(f"{npz_name}.npz", images=imgs, gaze_coords=gaze_pos)
 
 
 if __name__ == "__main__":

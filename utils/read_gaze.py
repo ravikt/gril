@@ -8,7 +8,7 @@ from scipy.stats import multivariate_normal
 from scipy.ndimage import gaussian_filter
 import torch
 
-
+'''
 def reshape_image(image):
     """Warp frames to 84x84 as done in the Nature paper and later work."""
     width = 224 #84
@@ -17,6 +17,20 @@ def reshape_image(image):
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
     frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
     return frame / 255.0
+'''
+
+
+def reshape_image(image):
+    """Resize to the same size as the one in Ritwik's work."""
+    width = 224
+    height = 224
+    frame = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
+    frame = np.expand_dims(frame, axis=2)
+    #cv2.imwrite('rgb_cv.png', frame)
+    #plt.imsave('rgb_plt.png', frame)
+    return frame / 255.0
+
 
 
 def reshape_heatmap(heatmap):
@@ -28,7 +42,7 @@ def reshape_heatmap(heatmap):
     for i in range(len(heatmap)):
         ghmap.append(cv2.resize(
             heatmap[i], (224, 224), interpolation=cv2.INTER_AREA))
-
+    
     return np.array(ghmap)
 
 
@@ -46,12 +60,6 @@ def get_mask(center, size, sig):
 
 h = 224 # 480  # row
 w = 224 #704  # column
-# gaze_pos = np.array(gaze_pos)
-# gaze_pos = gaze_pos.astype(float)
-
-# plt.figure()
-# plt.imshow(out)
-# plt.show()
 
 
 def preprocess_gaze_heatmap(gaze_2ds, sigma):

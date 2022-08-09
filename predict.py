@@ -1,41 +1,42 @@
-# Example python predict.py -p ../results_test/small_large_res.h5 -i ../sample/img/ -o ../sample/
+''' 
+This scripts generates prediction from gaze model(.h5 file). It takes 224x224 normalized image
+and produces gaze heatmap. Its purpose is to verify the trained gaze models and 
+visualize heatmap results.
+
+
+Example usage:
+              python predict.py -p <path/to/model.h5/file> -i ..</sample/img/> -o ..</output/directory/for/results>
+'''
 
 import argparse
 import cv2
 import tensorflow as tf
 import sys
 import numpy as np
-from load_data import Dataset
-#from tf.keras.models import load_model
-from human_gaze import my_softmax, my_kld, NSS
+from losses import my_softmax, my_kld
 import matplotlib.pyplot as plt
 import os
 import re
 import datetime
-#from utils import read_gaze
 
 
 def reshape_image(image):
-    """Warp frames to 84x84 as done in the Nature paper and later work."""
-    width = 224
-    height = 224
+    """Warp frames to 224x224 as done in Ritwik's thesis."""
+    width = 224 #84
+    height = 224 #84
     frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
     frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
+    frame = np.expand_dims(frame, axis=2)
+    frame = np.expand_dims(frame, axis=0)
     return frame / 255.0
+
 
 
 customObjects = {
     'my_softmax': my_softmax,
-    'my_kld': my_kld,
-    'NSS': NSS
+    'my_kld': my_kld
 }
-
-
-#d = Dataset(sys.argv[1], sys.argv[2])
-#sample = d.generate_data_for_gaze_prediction()
-
-# d.load_predicted_gaze_heatmap(sys.argv[3])
 
 
 def save_preds(idx, img_pred, ouput_path):
@@ -63,9 +64,10 @@ def gaze_predict(input_path, model_path, output_path):
         #print(img.shape)
         #print(os.path.join(test_data_path, img_path))
         img = reshape_image(img)
-        img = np.reshape(img, (1, 224, 224, 1))
+        print(img.shape)
+        #img = np.reshape(img, (1, 224, 224, 1))
 
-        output = agil.predict(img)
+        output = agil.predict(img, batch_size=1)
         print(output.shape)
         out_img = np.squeeze(output, axis=0)
         save_preds(get_index(img_path), out_img, output_path)
