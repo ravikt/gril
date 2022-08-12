@@ -296,3 +296,33 @@ def agil_airsim():
     agil_airsim_model.summary()
     
     return agil_airsim_model
+
+def vanilla_bc():
+
+    inputs= Input(shape=(224, 224, 1))
+    x=inputs # inputs is used by the line "Model(inputs, ... )" below
+    x=Conv2D(32, (5,5), strides=2, padding='same', activation='relu')(x)
+
+    x=Conv2D(64, (3,3), strides=2, padding='same', activation='relu')(x)
+    # x=Dropout(dropout)(x)
+
+    x=Conv2D(64, (3,3), strides=2, padding='same', activation='relu')(x)
+    # x=L.Dropout(dropout)(x)
+
+    x=Conv2D(64, (3,3), strides=1, padding='same', activation='relu')(x)
+
+    x=Conv2D(32, (3,3), strides=1, padding='same', activation='relu')(x)
+
+    # x= Dropout(dropout)(x)
+    x= Flatten()(x)
+
+    x= Dense(512, activation='relu')(x)
+    x= Dense(256, activation='relu')(x)
+    # output= Dense(4, activation='softmax')(x)
+    output= Dense(4)(x)
+
+    # x=L.Dropout(dropout)(x)
+
+    model=Model(inputs=inputs, outputs=output)
+
+    return model
