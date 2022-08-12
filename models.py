@@ -1,10 +1,16 @@
-'''This file reads a trained gaze prediction network by Zhang et al. 2020, and a data file, then outputs human attention map
-Zhang, R., Walshe, C., Liu, Z., Guan, L., Muller, K., Whritner, J., ... & Ballard, D. (2020, April). Atari-head: Atari human eye-tracking and demonstration dataset. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 34, No. 04, pp. 6811-6820).'''
 
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers as L
+from tensorflow.keras.utils import plot_model
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import Conv2D
+from tensorflow.keras.layers import MaxPool2D
+from tensorflow.keras.layers import Concatenate
 import matplotlib.pyplot as plt
 import os
 import random
@@ -153,71 +159,83 @@ def gaze_coord_model():
 
     return model
 
-# def agil_gaze_model():
-#     # Constants
-#     img_shape = 224 #84
-#     k = 1
-#     # Constants
-#     SHAPE = (img_shape, img_shape, 1)  # height * width
-#     dropout = 0.0
-#     ###############################
-#     # Architecture of the network #
-#     ###############################
-#     imgs  = L.Input(shape=SHAPE) 
-#     #x     = L.Reshape((224,224,1))(imgs)
-#     x = imgs
+def aril():
+   
+    resnet = tf.keras.applications.resnet50.ResNet50(
+    include_top=False,
+    weights='imagenet',
+    input_tensor=None,
+    input_shape=(224,224,3),
+    pooling=None,
+    )
 
-#     conv1 = L.Conv2D(32, (8, 8), strides=4, padding='same')
-#     x = conv1(x)
-#     x = L.Activation('relu')(x)
-#     x = L.BatchNormalization()(x)
-#     x = L.Dropout(dropout)(x)
+    resnet.trainable = False
+    
+   # RGB Channel
+    rgb = Input(shape=(224,224,3), name='image')
+    # conv11 = Conv2D(32, kernel_size=4, activation='relu')(rgb)
+    # pool11 = MaxPool2D(pool_size=(2, 2))(conv11)
+    # conv12 = Conv2D(16, kernel_size=4, activation='relu')(pool11)
+    # pool12 = MaxPool2D(pool_size=(2, 2))(conv12)
+    x = resnet(rgb, training = False)
+    pool12 = MaxPool2D(pool_size=(2, 2))(x)
+    rgb_flat = Flatten()(pool12)
 
-#     conv2 = L.Conv2D(64, (4, 4), strides=2, padding='same')
-#     x = conv2(x)
-#     x = L.Activation('relu')(x)
-#     x = L.BatchNormalization()(x)
-#     x = L.Dropout(dropout)(x)
+    # Depth Channel
+    depth = Input(shape=(224,224,1), name='depth')
+    conv21 = Conv2D(32, kernel_size=4, activation='relu')(depth)
+    pool21 = MaxPool2D(pool_size=(2, 2))(conv21)
+    conv22 = Conv2D(16, kernel_size=4, activation='relu')(pool21)
+    pool22 = MaxPool2D(pool_size=(2, 2))(conv22)
+    depth_flat = Flatten()(pool22)
+    
+    
+    # Shared feature extraction layer
+    # merge pool12 and pool22
+    # shared_layer = Concatenate([pool12, pool22])
 
-#     conv3 = L.Conv2D(64, (3, 3), strides=1, padding='same')
-#     x = conv3(x)
-#     x = L.Activation('relu')(x)
-#     x = L.BatchNormalization()(x)
-#     x = L.Dropout(dropout)(x)
+    shared_layer = tf.keras.layers.concatenate([rgb_flat, depth_flat])
+ 
 
-#     deconv1 = L.Conv2DTranspose(64, (3, 3), strides=1, padding='same')
-#     x = deconv1(x)
-#     x = L.Activation('relu')(x)
-#     x = L.BatchNormalization()(x)
-#     x = L.Dropout(dropout)(x)
+    # action prediction head
+    x1= Dense(512, activation='elu')(shared_layer)
+    x1= Dense(256, activation='elu')(x1)
+    x1= Dense(128, activation='elu')(x1)
 
-#     deconv2 = L.Conv2DTranspose(32, (4, 4), strides=2, padding='same')
-#     x = deconv2(x)
-#     x = L.Activation('relu')(x)
-#     x = L.BatchNormalization()(x)
-#     x = L.Dropout(dropout)(x)
-
-#     deconv3 = L.Conv2DTranspose(1, (8, 8), strides=4, padding='same')
-#     x = deconv3(x)
-
-#     outputs = L.Activation(my_softmax)(x)
-#     model = keras.Model(inputs=imgs, outputs=outputs)
-
-#     model.summary()
-
-#     return model
+    # action = Dense(4, activation='softmax')(x1)
+    action = Dense(4, name='action')(x1)
 
 
-#BATCH_SIZE = 1#50
-#num_epoch = 50
-num_action = 4 # act_roll, act_pitch, act_throttle, act_yaw
-SHAPE = (224,224, 1) # height * width * channel 
-dropout = 0.5
+    # conv1 = Conv2D(32, kernel_size=3, activation='relu')(shared_layer)
+    # pool1 = MaxPool2D(pool_size=(2, 2))(conv1)
+    # action = Flatten()(pool1)
+
+    # gaze prediction head
+    x2= Dense(512, activation='relu')(shared_layer)
+    x2= Dense(256, activation='relu')(x2)
+    x2= Dense(128, activation='relu')(x2)
+
+    # gaze= Dense(2, activation='softmax')(x2)
+    gaze= Dense(2, name='gaze')(x2)
+
+    # conv2 = Conv2D(16, kernel_size=3, activation='relu')(shared_layer)
+    # pool2 = MaxPool2D(pool_size=(2, 2))(conv2)
+    # gaze = Flatten()(pool2)
+
+    model = Model(inputs = [rgb, depth], outputs=[action, gaze])
+    
+    return model
+
+
+
 
 def agil_airsim(): 
     ###############################
     # Architecture of the network #
     ###############################
+    num_action = 4 # act_roll, act_pitch, act_throttle, act_yaw
+    SHAPE = (224,224, 1) # height * width * channel 
+    dropout = 0.5
 
     gaze_heatmaps = L.Input(shape=(SHAPE), name='gaze')
     g=L.BatchNormalization()(gaze_heatmaps)
