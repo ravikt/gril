@@ -161,7 +161,7 @@ def gaze_coord_model():
 
 def aril():
    
-    resnet = tf.keras.applications.resnet50.ResNet50(
+    resnet = tf.keras.applications.mobilenet.MobileNet(
     include_top=False,
     weights='imagenet',
     input_tensor=None,
@@ -178,16 +178,32 @@ def aril():
     # conv12 = Conv2D(16, kernel_size=4, activation='relu')(pool11)
     # pool12 = MaxPool2D(pool_size=(2, 2))(conv12)
     x = resnet(rgb, training = False)
-    pool12 = MaxPool2D(pool_size=(2, 2))(x)
-    rgb_flat = Flatten()(pool12)
+  
+    x = Conv2D(64, (5,5), strides=2, padding='same', activation='relu')(x)
+
+    x = Conv2D(64, (5,5), strides=2, padding='same', activation='relu')(x)
+
+    #conv13 = Conv2D(32, (5,5), strides=2, padding='same', activation='relu')(conv12)
+
+    #conv14 = Conv2D(16, (5,5), strides=2, padding='same', activation='relu')(conv13)
+
+ 
+    pool11 = MaxPool2D(pool_size=(2, 2))(x)
+    rgb_flat = Flatten()(pool11)
 
     # Depth Channel
-    depth = Input(shape=(224,224,1), name='depth')
-    conv21 = Conv2D(32, kernel_size=4, activation='relu')(depth)
-    pool21 = MaxPool2D(pool_size=(2, 2))(conv21)
-    conv22 = Conv2D(16, kernel_size=4, activation='relu')(pool21)
-    pool22 = MaxPool2D(pool_size=(2, 2))(conv22)
-    depth_flat = Flatten()(pool22)
+    depth = Input(shape=(224,224,3), name='depth')
+    conv21 = Conv2D(64, (5,5), strides=2, padding='same', activation='relu')(depth)
+  
+    conv22 = Conv2D(64, (5,5), strides=2, padding='same', activation='relu')(conv21)
+
+    conv23 = Conv2D(32, (5,5), strides=2, padding='same', activation='relu')(conv22)
+  
+    conv24 = Conv2D(16, (5,5), strides=2, padding='same', activation='relu')(conv23)
+ 
+    pool21 = MaxPool2D(pool_size=(2, 2))(conv24)
+
+    depth_flat = Flatten()(pool21)
     
     
     # Shared feature extraction layer
@@ -201,7 +217,8 @@ def aril():
     x1= Dense(512, activation='elu')(shared_layer)
     x1= Dense(256, activation='elu')(x1)
     x1= Dense(128, activation='elu')(x1)
-
+    x1= Dense(64, activation='elu')(x1)
+   
     # action = Dense(4, activation='softmax')(x1)
     action = Dense(4, name='action')(x1)
 
@@ -214,6 +231,7 @@ def aril():
     x2= Dense(512, activation='relu')(shared_layer)
     x2= Dense(256, activation='relu')(x2)
     x2= Dense(128, activation='relu')(x2)
+    x2= Dense(64, activation='relu')(x2)
 
     # gaze= Dense(2, activation='softmax')(x2)
     gaze= Dense(2, name='gaze')(x2)
@@ -223,7 +241,8 @@ def aril():
     # gaze = Flatten()(pool2)
 
     model = Model(inputs = [rgb, depth], outputs=[action, gaze])
-    
+   
+    model.summary() 
     return model
 
 
@@ -326,3 +345,4 @@ def vanilla_bc():
     model=Model(inputs=inputs, outputs=output)
 
     return model
+
