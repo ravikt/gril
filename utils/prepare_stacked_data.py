@@ -10,6 +10,7 @@ import csv
 import cv2
 import numpy as np
 import os
+import re
 from itertools import zip_longest
 
 def reshape_depth(depth):
@@ -54,63 +55,67 @@ def prepare_data(data_path):
             next(gaze)  # skip the head rowi
 
             for i, row in enumerate(zip_longest(gaze, gaze)):
-
-                # read consecutive images
-                img_path1   = os.path.join(dirname, "rgb", row[0][3].split("/")[-1])
-                img_path2   = os.path.join(dirname, "rgb", row[1][3].split("/")[-1])
+                if row[1]:
+                   # read consecutive images
+                   img_path1   = os.path.join(dirname, "rgb", row[0][3].split("/")[-1])
+                   img_path2   = os.path.join(dirname, "rgb", row[1][3].split("/")[-1])
      
-                # read consecutive depth images
-                depth_path1 = os.path.join(dirname, "depth", row[0][5].split("/")[-1])                
-                depth_path2 = os.path.join(dirname, "depth", row[1][5].split("/")[-1])                
+                   # read consecutive depth images
+                   depth_path1 = os.path.join(dirname, "depth", row[0][5].split("/")[-1])                
+                   depth_path2 = os.path.join(dirname, "depth", row[1][5].split("/")[-1])                
 
-                # print(img_path)
-                if os.path.exists(img_path1):
-                    print("rgb", row[0][3].split("/")[-1], row[1][3].split("/")[-1])
+                   # print(img_path)
+                   print("rgb", row[0][3].split("/")[-1], row[1][3].split("/")[-1])
                     
                     # read color images
-                    im1 = np.float32(cv2.imread(img_path1))
-                    im1 = reshape_image(im1)  
-                    im2 = np.float32(cv2.imread(img_path2))
-                    im2 = reshape_image(im2)  
+                   im1 = np.float32(cv2.imread(img_path1))
+                   im1 = reshape_image(im1)  
+                   im2 = np.float32(cv2.imread(img_path2))
+                   im2 = reshape_image(im2)  
 
-                    imgs.append(np.dstack((im1, im2)))
+                   imgs.append(np.dstack((im1, im2)))
                      
                     # read depth images
-                    dt1 = np.float32(cv2.imread(depth_path1))
-                    dt1 = reshape_depth(dt1)
-                    dt2 = np.float32(cv2.imread(depth_path2))
-                    dt2 = reshape_depth(dt2)
+                   dt1 = np.float32(cv2.imread(depth_path1))
+                   dt1 = reshape_depth(dt1)
+                   dt2 = np.float32(cv2.imread(depth_path2))
+                   dt2 = reshape_depth(dt2)
                     
-                    depth.append(np.dstack((dt1, dt2)))
+                   depth.append(np.dstack((dt1, dt2)))
 
                     # gaze coordinate
-                    coords1 = np.array((row[0][-3], row[0][-2]))
-                    coords2 = np.array((row[1][-3], row[1][-2]))
-                    coords = np.hstack((coords1, coords2))
-                    gaze_pos.append(coords)
+                    # coords1 = np.array((row[0][-3], row[0][-2]))
+                    # coords2 = np.array((row[1][-3], row[1][-2]))
+                   coords1 = np.array((float(row[0][-3]), float(row[0][-2])))
+                   coords2 = np.array((float(row[1][-3]), float(row[1][-2])))
+                    # coords = np.hstack((coords1, coords2))
+                   coords = np.mean([coords1, coords2], axis=0)
+                   gaze_pos.append(coords)
                     
                     # action labels
                     # act_roll, act_pitch, act_throttle, act_yaw
-                    act_commands1 = np.array((row[0][-7], row[0][-6], row[0][-5], row[0][-4]))
-                    act_commands2 = np.array((row[1][-7], row[1][-6], row[1][-5], row[1][-4]))
-                    act_commands = np.hstack((act_commands1, act_commands2))
-
-                    act_lbls.append(act_commands)
+                   act_commands1 = np.array((float(row[0][-7]), float(row[0][-6]), float(row[0][-5]), float(row[0][-4])))
+                   act_commands2 = np.array((float(row[1][-7]), float(row[1][-6]), float(row[1][-5]), float(row[1][-4])))
+                    # act_commands = np.hstack((act_commands1, act_commands2))
+                   act_commands = np.mean([act_commands1, act_commands2], axis=0)
+                   act_lbls.append(act_commands)
 
             gaze_pos = np.array(gaze_pos)
-            gaze_pos = gaze_pos.astype(np.float32)
+            #gaze_pos = gaze_pos.astype(float)
 
             act_lbls = np.array(act_lbls)
-            act_lbls = act_lbls.astype(np.float32)
+            #act_lbls = act_lbls.astype(float)
             # print(gaze_pos.shape)
             imgs = np.array(imgs)
             depth= np.array(depth)
             #print(imgs.shape)
 
-            print(depth.shape, np.dtype(depth))
-            print(imgs.shape, np.dtype(imgs))
-            print(gaze_pos.shape, np.dtype(gaze_pos))
-            print(act_lbls.shape, np.dtype(act_lbls))
+
+            
+            print(depth.shape, depth.dtype)
+            print(imgs.shape, imgs.dtype)
+            print(gaze_pos.shape, gaze_pos.dtype)
+            print(act_lbls.shape, act_lbls.dtype)
              
             gaze_pos = np.reshape(gaze_pos, (gaze_pos.shape[0], gaze_pos.shape[1], 1))
             act_lbls = np.reshape(act_lbls, (act_lbls.shape[0], act_lbls.shape[1], 1))
