@@ -26,3 +26,17 @@ def my_kld(y_true, y_pred):
     y_pred = keras.backend.clip(y_pred, epsilon, 1)
     return keras.backend.sum(y_true * keras.backend.log(y_true / y_pred), axis=[1, 2, 3])
 
+def action_loss(y_true, y_pred):
+    """
+    Weighted MSE for control commands. This loss function gives
+    higher weightage to errors in roll and yaw commands
+    The weight coefficient are [0.40, 0.10,0.10, 0.40]
+    for roll, pitch, throttle and yaw respectively
+    """
+
+    squared_difference = tf.square(y_true - y_pred)
+    weights = np.array([[0.40, 0.10, 0.10, 0.40]])
+    weighted_squared_difference = weights*squared_difference
+
+    return tf.reduce_mean(weighted_squared_difference, axis=-1)
+
