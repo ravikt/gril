@@ -6,7 +6,7 @@
 The code is part of development of regualrized imitation learning model for developing UAS to perform autonomous tasks like search and navigation. At present the repository contains implementation of AGIL (see reference). The below image shows the gaze heatmap estimation and vecloity command prediction by the trained model.
 
 
-<img src="misc/results.png" width="600">
+<img src="misc/aril.gif" width="600">
 
 ### Requirements
 
