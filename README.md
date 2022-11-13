@@ -1,5 +1,5 @@
-##  Gaze Regularized Imitation Learning:
-##Learning Continuous Control from Human Gaze
+##     Gaze Regularized Imitation Learning:
+### Learning Continuous Control from Human Gaze
 
 <img src="misc/aril.png" width="600">
 
