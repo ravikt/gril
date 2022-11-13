@@ -1,9 +1,10 @@
-## Learning Visual Search and Navigation Task Using Human Gaze
+##  Gaze Regularized Imitation Learning:
+##Learning Continuous Control from Human Gaze
 
 <img src="misc/aril.png" width="600">
 
 
-The code is part of development of regualrized imitation learning model for developing UAS to perform autonomous tasks like search and navigation. At present the repository contains implementation of AGIL (see reference). The below image shows the gaze heatmap estimation and vecloity command prediction by the trained model.
+The code is part of development of gaze regualrized imitation learning model for quadrotor to perform tasks like search and navigation autonomously. At present the repository contains implementation of GRIL with comparative algorithms like AGIL (see reference) and BC. The below image shows the gaze heatmap estimation and vecloity command prediction by the trained model.
 
 
 <img src="misc/aril.gif" width="600">
@@ -16,4 +17,8 @@ pip3 install -r requirements.txt
 ```
 
 ### Reference
+
+Bera, Ritwik, et al. "[Gaze-Informed Multi-Objective Imitation Learning from Human Demonstrations.](https://arxiv.org/abs/2102.13008)" arXiv preprint arXiv:2102.13008 (2021)
+
 Zhang, Ruohan, et al. "[Agil: Learning attention from human for visuomotor tasks.](https://openaccess.thecvf.com/content_ECCV_2018/html/Ruohan_Zhang_AGIL_Learning_Attention_ECCV_2018_paper.html)" Proceedings of the european conference on computer vision (eccv). 2018
+
