@@ -47,7 +47,8 @@ class AirSimEnv():
         vx = sc / 1.5 * pitch #1
         vy = sc / 1.5 * roll #0
         vz = 10 * sc * yaw #3
-        ref_alt = self.client.getMultirotorState().kinematics_estimated.position.z_val + sc / 2 * throttle
+        self.state = self.client.getMultirotorState()
+        ref_alt = self.state.kinematics_estimated.position.z_val + sc / 2 * throttle
         return (vx, vy, vz, ref_alt)
 
     def inertialToBodyFrame(self, yaw, vx, vy):
