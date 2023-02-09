@@ -20,18 +20,20 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-e', '--episodes', type=int, help='Number of episodes to run', default=10)
 parser.add_argument('-d', '--duration', type=int, help='Duration of control command', default=1)
 parser.add_argument('-sc', '--sc', type=int, help='Constant related to ang->lin', default=10)
+args = parser.parse_args()
+
+print(args)
 
 # Experiment parameters
-EPISODES=parser.episodes
-DURATION=parser.duration
-SC=parser.sc
+EPISODES=args.episodes
+DURATION=args.duration
+SC=args.sc
 
 for i in range(EPISODES):
 
     done = False
     while not done:
 
-        env.getQuadrotorState()
         env.getRGBImage()
         pitch, roll, yaw, throttle = (np.random.rand()*10, np.random.rand()*10, np.random.rand()*10, np.random.rand()*10)
         vx, vy, vz, ref_alt = env.angularRatesToLinearVelocity(pitch, roll, yaw, throttle, SC)

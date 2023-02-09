@@ -4,10 +4,10 @@ import numpy as np
 import cv2
 class AirSimEnv():
     
-    def __init__():
-        # ensure connection to Airsim Env
-        # reset client?
-        pass
+    # def __init__():
+    #     # ensure connection to Airsim Env
+    #     # reset client?
+    #     pass
     
     def connectQuadrotor(self) -> None:
         self.client = airsim.MultirotorClient()
@@ -28,6 +28,9 @@ class AirSimEnv():
     def hover(self) -> None:
         self.client.hoverAsync().join()
 
+    def hasCollided(self):
+        return 
+
     def getRGBImage(self) -> np.ndarray:
         # retrieve single RGB image from the camera
         response = self.client.simGetImages([airsim.ImageRequest("0", airsim.ImageType.Scene, False, False)])[0]
@@ -39,17 +42,12 @@ class AirSimEnv():
  
     def saveImage(self, filename: str, image: np.ndarray) -> None:
         cv2.imwrite(filename, image)
-
-    def getQuadrotorState(self) -> any :
-        # get quadrotor state
-        self.state = self.client.getMultirotorState()
-        return self.state
         
     def angularRatesToLinearVelocity(self, pitch, roll, yaw, throttle, sc) -> tuple:
         vx = sc / 1.5 * pitch #1
         vy = sc / 1.5 * roll #0
         vz = 10 * sc * yaw #3
-        ref_alt = self.state.kinematics_estimated.position.z_val + sc / 2 * throttle
+        ref_alt = self.client.getMultirotorState().kinematics_estimated.position.z_val + sc / 2 * throttle
         return (vx, vy, vz, ref_alt)
 
     def inertialToBodyFrame(self, yaw, vx, vy):
@@ -69,7 +67,6 @@ class AirSimEnv():
             airsim.DrivetrainType.MaxDegreeOfFreedom,
             airsim.YawMode(True, vz),
         )
-
 
     def toEulerianAngle(q):
             z = q.z_val
