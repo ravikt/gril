@@ -35,10 +35,13 @@ for i in range(EPISODES):
     while not done:
 
         env.getRGBImage()
+        # random agent
         pitch, roll, yaw, throttle = (np.random.rand()*10, np.random.rand()*10, np.random.rand()*10, np.random.rand()*10)
         vx, vy, vz, ref_alt = env.angularRatesToLinearVelocity(pitch, roll, yaw, throttle, SC)
         vb = env.inertialToBodyFrame(yaw, vx, vy)
         env.controlQuadrotor(vb, vz, ref_alt, DURATION)
+
+
 
 
     

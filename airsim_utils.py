@@ -38,7 +38,18 @@ class AirSimEnv():
         img1d = np.fromstring(response.image_data_uint8, dtype=np.uint8)
         # for Unreal 4.25
         img_rgb = img1d.reshape(response.height, response.width, 3)
-        return img_rgb        
+
+        return img_rgb
+
+    def getDepthImage(self):
+        
+        response = self.client.simGetImages([airsim.ImageRequest(0, airsim.ImageType.DepthVis, True)])[0]
+
+        dp1d = np.array(response.image_data_float, dtype=np.float32)
+        dp = dp1d.reshape(response.height, response.width)
+        img_depth = np.array(np.abs(1-dp) * 255, dtype=np.uint8)
+
+        return img_depth
  
     def saveImage(self, filename: str, image: np.ndarray) -> None:
         cv2.imwrite(filename, image)
