@@ -30,10 +30,10 @@ DURATION=args.duration
 SC=args.sc
 
 for i in range(EPISODES):
-
     done = False
+    env.teleportRelativeQuadrotor(0, 0, 0, 0) # x, y, z, and yaw [-1 to 1]
     while not done:
-
+        
         env.getRGBImage()
         # random agent
         pitch, roll, yaw, throttle = (np.random.rand()*10, np.random.rand()*10, np.random.rand()*10, np.random.rand()*10)

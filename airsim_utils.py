@@ -4,13 +4,10 @@ import numpy as np
 import cv2
 class AirSimEnv():
     
-    # def __init__():
-    #     # ensure connection to Airsim Env
-    #     # reset client?
-    #     pass
+    def __init__(self):
+        self.client = airsim.MultirotorClient()
     
     def connectQuadrotor(self) -> None:
-        self.client = airsim.MultirotorClient()
         self.client.confirmConnection()
 
     def enableAPI(self, is_enable: bool) -> None:
@@ -106,4 +103,12 @@ class AirSimEnv():
         yaw = math.atan2(t3, t4)
 
         return (pitch, roll, yaw)
+    
+    def teleportRelativeQuadrotor(self, x, y, z, yaw):
+        pose = self.client.simGetVehiclePose()
+        pose.position.x_val += x
+        pose.position.y_val += y
+        pose.position.z_val += z
+        pose.orientation.z_val += yaw
+        self.client.simSetVehiclePose(pose, True, "SimpleFlight")
 
