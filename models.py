@@ -12,9 +12,9 @@ from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import MaxPool2D
 from tensorflow.keras.layers import Concatenate
 
-def aril():
+def gril():
    
-    resnet = tf.keras.applications.mobilenet.MobileNet(
+    mobilenet = tf.keras.applications.mobilenet.MobileNet(
     include_top=False,
     weights='imagenet',
     input_tensor=None,
@@ -22,14 +22,11 @@ def aril():
     pooling=None,
     )
 
-    resnet.trainable = False
+    mobilenet.trainable = False
     
    # RGB Channel
     rgb = Input(shape=(224,224,3), name='image')
-    # conv11 = Conv2D(32, kernel_size=4, activation='relu')(rgb)
-    # pool11 = MaxPool2D(pool_size=(2, 2))(conv11)
-    # conv12 = Conv2D(16, kernel_size=4, activation='relu')(pool11)
-    # pool12 = MaxPool2D(pool_size=(2, 2))(conv12)
+    
     x = resnet(rgb, training = False)
   
     x = Conv2D(64, (5,5), strides=2, padding='same', activation='relu')(x)
@@ -97,3 +94,150 @@ def aril():
    
     model.summary() 
     return model
+    
+
+def agil_airsim(): 
+    ###############################
+    # Zhang et.al "AGIL: Learning Attention from Human for Visuomotor Tasks"
+    ###############################
+    num_action = 4 # act_roll, act_pitch, act_throttle, act_yaw
+    SHAPE = (224,224, 1) # height * width * channel 
+    dropout = 0.5
+
+    gaze_heatmaps = L.Input(shape=(SHAPE), name='gaze')
+    g=L.BatchNormalization()(gaze_heatmaps)
+
+    imgs=L.Input(shape=SHAPE, name='images')
+    #x=L.Reshape((224, 224, 1))(imgs)
+    x = imgs
+    x = L.Multiply()([x,g])
+    x_intermediate=x
+
+    x=L.Conv2D(128, (5,5), strides=2, padding='same', activation='elu')(x)
+ 
+    x=L.Conv2D(64, (5,5), strides=2, padding='same', activation='elu')(x)
+
+    x=L.Conv2D(64, (5,5), strides=2, padding='same', activation='elu')(x)
+    #x=L.Dropout(dropout)(x)
+
+    x=L.Conv2D(32, (5,5), strides=2, padding='same', activation='elu')(x)
+    #x=L.Dropout(dropout)(x)
+
+    x=L.Conv2D(32, (5,5), strides=2, padding='same', activation='elu')(x)
+   
+    x=L.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(x)
+    x=L.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(x)
+
+    # ============================ channel 2 ============================
+    orig_x=imgs
+   
+    orig_x=L.Conv2D(128, (5,5), strides=2, padding='same', activation='elu')(orig_x)
+
+    orig_x=L.Conv2D(64, (5,5), strides=2, padding='same', activation='elu')(orig_x)
+ 
+    orig_x=L.Conv2D(64, (5,5), strides=2, padding='same', activation='elu')(orig_x)
+
+    orig_x=L.Conv2D(32, (5,5), strides=2, padding='same', activation='elu')(orig_x)
+
+    orig_x=L.Conv2D(32, (5,5), strides=2, padding='same', activation='elu')(orig_x)
+
+    orig_x= L.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(orig_x)
+    orig_x= L.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(orig_x)
+  
+ 
+    x=L.Average()([x,orig_x])
+    #x=L.Dropout(dropout)(x)
+    x=L.Flatten()(x)
+    x=L.Dropout(dropout)(x)
+    # ReLU??
+    x=L.Dense(512, activation='elu')(x)
+    x=L.Dense(256, activation='elu')(x)
+    x=L.Dense(128, activation='elu')(x)
+    #x=L.Dropout(dropout)(x)
+    output=L.Dense(num_action, name='action')(x)    
+
+    agil_airsim_model=keras.Model(inputs=[imgs, gaze_heatmaps], outputs=output)
+    agil_airsim_model.summary()
+    
+    return agil_airsim_model
+    
+
+def il_cgl():
+    
+    
+  # RGB Channel
+    rgb = Input(shape=(224,224,3), name='image')
+       
+
+    # inputs= Input(shape=(224, 224, 3), name="image")
+
+    x=L.Conv2D(128, (5,5), strides=2, padding='same', activation='elu')(rgb)
+
+    x=L.Conv2D(128, (5,5), strides=2, padding='same', activation='elu')(x)
+
+    x=L.Conv2D(64, (5,5), strides=2, padding='same', activation='elu')(x)
+
+    # x=L.Conv2D(64, (5,5), strides=2, padding='same', activation='elu')(x)
+
+    # x=L.Conv2D(32, (5,5), strides=2, padding='same', activation='elu')(x)
+
+    # x=L.Conv2D(32, (5,5), strides=2, padding='same', activation='elu')(x)
+
+    # CGL conv output
+    last_conv = L.Conv2D(1, (1,1), strides=1, padding='same')
+    z = last_conv(x)
+    cgl_out = L.Activation(my_softmax, name="gaze")(z)
+
+    y = L.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(x)
+
+    y = L.Flatten()(y)
+    y = L.Dropout(0.5)(y)
+
+    y = L.Dense(256, activation='elu')(y)
+    y = L.Dropout(0.5)(y)
+    y = L.Dense(128, activation='elu')(y)
+    #x = L.Dropout(0.5)(x)
+    y = L.Dense(64, activation='elu')(y)
+
+    action = Dense(4, name="action")(y)
+
+
+    model = Model(inputs=rgb, outputs=[cgl_out, action])
+
+    return model
+    
+def vanilla_bc():
+
+    inputs= Input(shape=(224, 224, 3), name="image")
+    
+    x=L.Conv2D(128, (5,5), strides=2, padding='same', activation='elu')(inputs)
+    
+    x=L.Conv2D(128, (5,5), strides=2, padding='same', activation='elu')(x)
+
+    x=L.Conv2D(64, (5,5), strides=2, padding='same', activation='elu')(x)
+ 
+    x=L.Conv2D(64, (5,5), strides=2, padding='same', activation='elu')(x)
+
+    x=L.Conv2D(32, (5,5), strides=2, padding='same', activation='elu')(x)
+
+    x=L.Conv2D(32, (5,5), strides=2, padding='same', activation='elu')(x)
+
+    x= L.MaxPooling2D(pool_size=(2, 2), strides=(2, 2))(x)
+  
+ 
+    x = L.Flatten()(x)
+    x = L.Dropout(0.5)(x)
+
+    x = L.Dense(256, activation='elu')(x)
+    x = L.Dropout(0.5)(x)
+    x = L.Dense(128, activation='elu')(x)
+    #x = L.Dropout(0.5)(x)
+    x = L.Dense(64, activation='elu')(x)
+
+    output= Dense(4, name="action")(x)
+
+    
+    model=Model(inputs=inputs, outputs=output)
+
+    return model
+
