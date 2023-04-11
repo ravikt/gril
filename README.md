@@ -4,7 +4,7 @@
 <img src="misc/gril.png" width="600">
 
 
-This repository conatins implementationof gaze regualrized imitation learning. The trained model is tested in AisrSim with a quadrotor to perform tasks like search and navigation autonomously. At present the repository contains implementation of GRIL with baseline algorithms. The below image shows GRIL's generalization on movning target scenario.
+This repository contains the implementation of gaze-regularized imitation learning. The trained model is tested in AirSim with a quadrotor to perform tasks like search and navigation autonomously. At present, the repository contains implementation of GRIL with baseline algorithms. The GIF below shows GRIL's generalization on a moving target scenario.
 
 
 <img src="misc/gril.gif" width="600">
