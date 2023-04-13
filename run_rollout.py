@@ -2,6 +2,7 @@ import airsim
 import numpy as np
 import cv2
 import argparse
+import sys
 
 from airsim_utils import AirSimEnv
 
@@ -28,10 +29,10 @@ print(args)
 EPISODES=args.episodes
 DURATION=args.duration
 SC=args.sc
-
+sys.argv[1], sys.argv[2]
 for i in range(EPISODES):
     done = False
-    env.teleportRelativeQuadrotor(0, 0, 0, 0) # x, y, z, and yaw [-1 to 1]
+    env.raviktTeleportQuadrotor(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]) # x, y, z, and yaw [-1 to 1]
     while not done:
         
         env.getRGBImage()

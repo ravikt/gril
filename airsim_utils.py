@@ -112,3 +112,10 @@ class AirSimEnv():
         pose.orientation.z_val += yaw
         self.client.simSetVehiclePose(pose, True, "SimpleFlight")
 
+   def raviktTeleportQuadrotor(self, x, y, z, yaw):
+        pose = self.client.simGetVehiclePose()
+        pose.position.x_val += x
+        pose.position.y_val += y
+        pose.position.z_val = z
+        pose.orientation.z_val += yaw
+        self.client.simSetVehiclePose(pose, True, "SimpleFlight")
