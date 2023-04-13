@@ -32,7 +32,7 @@ def reshape_image(image):
     return frame / 255.0
 
 
-def arilNN(airsim_img, depth, aril):
+def grilNN(airsim_img, depth, aril):
     # Reshape image from AirSim camera
     print("Type and max-min values")
     print(airsim_img.dtype, depth.dtype)
