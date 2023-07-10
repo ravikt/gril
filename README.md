@@ -18,7 +18,7 @@ pip3 install -r requirements.txt
 
 ### Reference
 
-"[Gaze Regularized Imitation Learning: Learning Continuous Control from Human Gaze](https://arxiv.org/pdf/2102.13008.pdf)" arXiv preprint arXiv:2102.13008 (2023)
+"[Imitation Learning with Human Eye Gaze via Multi-Objective Prediction](https://openreview.net/pdf?id=MF1Tcmk2YB)" ILHF Workshop ICML 2023
 
 
 
