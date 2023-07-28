@@ -18,7 +18,8 @@ pip3 install -r requirements.txt
 
 ### Reference
 
-"[Imitation Learning with Human Eye Gaze via Multi-Objective Prediction](https://openreview.net/pdf?id=MF1Tcmk2YB)" ILHF Workshop ICML 2023
+Paper: [Imitation Learning with Human Eye Gaze via Multi-Objective Prediction](https://openreview.net/pdf?id=MF1Tcmk2YB) ILHF Workshop ICML 2023 
+Video: [Quadrotor following a moving truck](https://www.youtube.com/watch?v=vFiT293FR1Q)
 
 
 
