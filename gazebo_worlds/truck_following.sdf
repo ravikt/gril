@@ -1,0 +1,523 @@
+<?xml version="1.0" ?>
+<!--
+  Gazebo Harmonic world for GRIL truck-following task
+  
+  This world includes:
+  - Outdoor environment with roads
+  - Yellow truck on predefined path
+  - Quadrotor with RGB + Depth cameras
+  
+  Launch with: gz sim truck_following.sdf
+-->
+<sdf version="1.9">
+  <world name="truck_following_world">
+    
+    <!-- Physics -->
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    
+    <!-- Plugins -->
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    
+    <!-- Lighting -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+    
+    <!-- Ground plane -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.8 0.8 0.8 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+    <!-- Road (simple gray plane) -->
+    <model name="road">
+      <static>true</static>
+      <pose>0 0 0.01 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>50 8 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.3 0.3 0.3 1</ambient>
+            <diffuse>0.3 0.3 0.3 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+    <!-- Yellow Truck with animated movement -->
+    <model name="yellow_truck">
+      <pose>0 0 0.5 0 0 0</pose>
+      <static>false</static>
+      
+      <!-- Define the truck visual as part of the actor -->
+      <link name="chassis">
+        <inertial>
+          <mass>500</mass>
+          <inertia>
+            <ixx>100</ixx>
+            <iyy>200</iyy>
+            <izz>100</izz>
+          </inertia>
+        </inertial>
+        
+        <!-- Truck body -->
+        <visual name="body">
+          <geometry>
+            <box>
+              <size>4 2 1.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1.0 0.9 0.0 1</ambient>
+            <diffuse>1.0 0.9 0.0 1</diffuse>
+            <specular>0.5 0.5 0.5 1</specular>
+          </material>
+        </visual>
+        
+        <!-- Truck cab -->
+        <visual name="cab">
+          <pose>1.5 0 0.75 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 2 1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1.0 0.9 0.0 1</ambient>
+            <diffuse>1.0 0.9 0.0 1</diffuse>
+          </material>
+        </visual>
+        
+        <collision name="body_collision">
+          <geometry>
+            <box>
+              <size>4 2 1.5</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+      
+      <!-- Plugin to move truck along path -->
+      <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
+        <publish_link_pose>true</publish_link_pose>
+        <update_frequency>30</update_frequency>
+      </plugin>
+    </model>
+    
+    <!-- Quadrotor -->
+    <model name="quadrotor">
+      <pose>0 -5 2 0 0 0</pose>
+      
+      <link name="base_link">
+        <inertial>
+          <mass>1.5</mass>
+          <inertia>
+            <ixx>0.029125</ixx>
+            <iyy>0.029125</iyy>
+            <izz>0.055225</izz>
+          </inertia>
+        </inertial>
+        
+        <!-- Quadrotor body - make it more visible -->
+        <visual name="body_visual">
+          <geometry>
+            <box>
+              <size>0.47 0.47 0.11</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0.2 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+        
+        <!-- Add colored arms for visibility -->
+        <visual name="arm_front">
+          <pose>0.2 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.02</radius>
+              <length>0.3</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>1 0 0 1</ambient>  <!-- Red front -->
+            <diffuse>1 0 0 1</diffuse>
+          </material>
+        </visual>
+        
+        <visual name="arm_right">
+          <pose>0 0.2 0 1.5707 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.02</radius>
+              <length>0.3</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0 1 0 1</ambient>  <!-- Green -->
+            <diffuse>0 1 0 1</diffuse>
+          </material>
+        </visual>
+        
+        <!-- Add propellers for better visibility -->
+        <visual name="prop_1">
+          <pose>0.15 0.15 0.1 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.02</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 0.7</ambient>
+            <diffuse>0.5 0.5 0.5 0.7</diffuse>
+          </material>
+        </visual>
+        
+        <visual name="prop_2">
+          <pose>-0.15 0.15 0.1 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.02</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 0.7</ambient>
+            <diffuse>0.5 0.5 0.5 0.7</diffuse>
+          </material>
+        </visual>
+        
+        <visual name="prop_3">
+          <pose>-0.15 -0.15 0.1 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.02</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 0.7</ambient>
+            <diffuse>0.5 0.5 0.5 0.7</diffuse>
+          </material>
+        </visual>
+        
+        <visual name="prop_4">
+          <pose>0.15 -0.15 0.1 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.02</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 0.7</ambient>
+            <diffuse>0.5 0.5 0.5 0.7</diffuse>
+          </material>
+        </visual>
+        
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.47 0.47 0.11</size>
+            </box>
+          </geometry>
+        </collision>
+        
+        <!-- RGB Camera -->
+        <sensor name="rgb_camera" type="camera">
+          <pose>0.1 0 0 0 0 0</pose>
+          <camera>
+            <horizontal_fov>1.047</horizontal_fov>  <!-- 60 degrees -->
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
+          <topic>/quadrotor/camera/rgb/image_raw</topic>
+        </sensor>
+        
+        <!-- Depth Camera -->
+        <sensor name="depth_camera" type="depth_camera">
+          <pose>0.1 0 0 0 0 0</pose>
+          <camera>
+            <horizontal_fov>1.047</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R_FLOAT32</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
+          <topic>/quadrotor/camera/depth/image_raw</topic>
+        </sensor>
+      </link>
+      
+      <!-- Quadrotor physics and control plugins -->
+      <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+        <robotNamespace>quadrotor</robotNamespace>
+        <motorNumber>0</motorNumber>
+        <turningDirection>ccw</turningDirection>
+      </plugin>
+      
+      <plugin filename="gz-sim-multicopter-control-system" name="gz::sim::systems::MulticopterVelocityControl">
+        <robotNamespace>quadrotor</robotNamespace>
+        <commandSubTopic>/quadrotor/cmd_vel</commandSubTopic>
+        <motorControlPubTopic>/quadrotor/motor_speed</motorControlPubTopic>
+        <enableSubTopic>/quadrotor/enable</enableSubTopic>
+      </plugin>
+      
+      <plugin filename="gz-sim-odometry-publisher-system" name="gz::sim::systems::OdometryPublisher">
+        <odom_topic>/quadrotor/odom</odom_topic>
+        <odom_frame>quadrotor/odom</odom_frame>
+        <robot_base_frame>quadrotor/base_link</robot_base_frame>
+      </plugin>
+    </model>
+    
+    <!-- Buildings/Obstacles for outdoor environment -->
+    
+    <!-- Building 1 - Left side -->
+    <model name="building_1">
+      <static>true</static>
+      <pose>-10 5 0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>8 6 4</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.7 0.5 0.3 1</ambient>
+            <diffuse>0.7 0.5 0.3 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>8 6 4</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+    
+    <!-- Building 2 - Right side -->
+    <model name="building_2">
+      <static>true</static>
+      <pose>10 8 0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>6 10 5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.6 0.6 0.7 1</ambient>
+            <diffuse>0.6 0.6 0.7 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>6 10 5</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+    
+    <!-- Building 3 - Behind -->
+    <model name="building_3">
+      <static>true</static>
+      <pose>5 -10 0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>12 5 3</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.5 0.6 0.5 1</ambient>
+            <diffuse>0.5 0.6 0.5 1</diffuse>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>12 5 3</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+    
+    <!-- Trees/Obstacles -->
+    <model name="tree_1">
+      <static>true</static>
+      <pose>-5 -3 0 0 0 0</pose>
+      <link name="link">
+        <!-- Trunk -->
+        <visual name="trunk">
+          <pose>0 0 1 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.3</radius>
+              <length>2</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.4 0.3 0.2 1</ambient>
+            <diffuse>0.4 0.3 0.2 1</diffuse>
+          </material>
+        </visual>
+        <!-- Foliage -->
+        <visual name="foliage">
+          <pose>0 0 2.5 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>1.5</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.1 0.6 0.1 1</ambient>
+            <diffuse>0.1 0.8 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+    <model name="tree_2">
+      <static>true</static>
+      <pose>8 -5 0 0 0 0</pose>
+      <link name="link">
+        <visual name="trunk">
+          <pose>0 0 1 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.3</radius>
+              <length>2</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.4 0.3 0.2 1</ambient>
+            <diffuse>0.4 0.3 0.2 1</diffuse>
+          </material>
+        </visual>
+        <visual name="foliage">
+          <pose>0 0 2.5 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>1.5</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <ambient>0.1 0.6 0.1 1</ambient>
+            <diffuse>0.1 0.8 0.1 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+    <!-- Traffic cones/markers along road -->
+    <model name="cone_1">
+      <static>true</static>
+      <pose>-20 -3 0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cone>
+              <radius>0.3</radius>
+              <length>0.8</length>
+            </cone>
+          </geometry>
+          <material>
+            <ambient>1 0.5 0 1</ambient>  <!-- Orange -->
+            <diffuse>1 0.5 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+    <model name="cone_2">
+      <static>true</static>
+      <pose>-20 3 0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <cone>
+              <radius>0.3</radius>
+              <length>0.8</length>
+            </cone>
+          </geometry>
+          <material>
+            <ambient>1 0.5 0 1</ambient>
+            <diffuse>1 0.5 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+  </world>
+</sdf>

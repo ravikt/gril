@@ -1,0 +1,48 @@
+# GRIL - Gaze Regularized Imitation Learning
+# Requirements for ROS2 Jazzy + Gazebo Harmonic deployment
+
+# ============================================================================
+# Core Deep Learning & Scientific Computing
+# ============================================================================
+tensorflow>=2.15.0
+numpy>=1.24.0
+scipy>=1.11.0
+opencv-python>=4.8.1
+
+# ============================================================================
+# Data Handling & Visualization
+# ============================================================================
+h5py>=3.10.0
+matplotlib>=3.8.0
+Pillow>=10.1.0
+
+# ============================================================================
+# Progress & Utilities
+# ============================================================================
+tqdm>=4.66.0
+
+# ============================================================================
+# ROS2 Jazzy Dependencies
+# ============================================================================
+# IMPORTANT: Install ROS2 Jazzy packages via apt, not pip:
+#
+#   sudo apt update
+#   sudo apt install ros-jazzy-desktop-full
+#   sudo apt install ros-jazzy-cv-bridge
+#   sudo apt install ros-jazzy-sensor-msgs
+#   sudo apt install ros-jazzy-geometry-msgs
+#   sudo apt install ros-jazzy-nav-msgs
+#   sudo apt install ros-jazzy-std-srvs
+#
+# Gazebo Harmonic:
+#   sudo apt install gz-harmonic
+#
+# ROS2-Gazebo bridge:
+#   sudo apt install ros-jazzy-ros-gz
+#
+# ============================================================================
+
+# Optional: Development tools
+# pytest>=7.4.0
+# black>=23.11.0
+# ruff>=0.1.0
